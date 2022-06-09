@@ -22,8 +22,7 @@ public class ItemService {
     public static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
     public Item retrieveHardcodedItem() {
-        Item item = new Item(1, "Toys", 20, 40);
-        return item;
+        return new Item(1, "Toys", 20, 40);
     }
 
     public Item retrieveById(int id) {
