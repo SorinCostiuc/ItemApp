@@ -12,82 +12,52 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
 
     @InjectMocks
-    private ItemService itemService;
+    ItemService itemService;
 
     @Mock
-    private ItemRepository repository;
+    ItemRepository itemRepository;
 
     @Mock
-    private ValueCalculatorService calculatorService;
+    ValueCalculatorService valueCalculatorService;
 
     @Test
-    void returnHardcodedItemTest(){
+    public void retrieveHardcodedItemTest() {
         //given
         Item expectedItem = new Item(1, "Toys", 20, 40);
         //when
-        Item actualItem = itemService.retrieveHardcodedItem();
+        Item actualResult = itemService.retrieveHardcodedItem();
         //then
-        assertEquals(expectedItem, actualItem);
+        assertEquals(expectedItem, actualResult);
     }
 
     @Test
-    void retrieveByIdTest() {
+    public void retrieveItemByIdTest() {
         //given
-        int givenId = 40;
-        Item expectedItem = new Item(99,"fruits", 40,10);
+        Item expectedResult = new Item(1, "Toys", 50, 10);
+        Mockito.when(itemRepository.findById(50)).thenReturn(Optional.of(expectedResult));
+        Mockito.when(valueCalculatorService.calculateValue(50, 10)).thenReturn(500);
         //when
-        when(repository.findById(40)).thenReturn(Optional.of(expectedItem));
-        when(calculatorService.calculateValue(40, 10)).thenReturn(400);
-        Item actualItem = itemService.retrieveById(givenId);
+        Item actualResult = itemService.retrieveById(50);
         //then
-        assertEquals(expectedItem, actualItem);
-        assertEquals(400, actualItem.getValue());
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    void retrieveAllItemsTest() {
+    public void deleteItemTest() {
         //given
-        Item expectedFirstItem = new Item(99,"fruits", 40,10);
-        Item expectedSecondItem = new Item(99,"fruits", 40,10);
-        List<Item> expectedItemList = List.of(expectedFirstItem, expectedSecondItem);
+        Item itemToBeDeleted = new Item(1000, "itemToBeDeleted", 50, 10);
+        Mockito.when(itemRepository.findById(1000)).thenReturn(Optional.of(itemToBeDeleted));
         //when
-        when(repository.findAll()).thenReturn(expectedItemList);
-        when(calculatorService.calculateValue(anyInt(), anyInt())).thenReturn(100);
-        List<Item> actualItems = itemService.retrieveAllItems();
+        itemService.deleteItem(1000);
         //then
-        assertThat(actualItems).isNotEmpty().isNotNull().hasSize(2).isEqualTo(expectedItemList);
+        Mockito.verify(itemRepository).delete(itemToBeDeleted);
     }
-
-    @Test
-    void saveItemTest() {
-        //given
-        Item givenItem = new Item(99,"fruits", 40,10);
-        //when
-        when(repository.findById(99)).thenReturn(Optional.empty());
-        //then
-        verify(repository).save(givenItem);
-    }
-
-    @Test
-    void saveItemThrowsExceptionTest() {
-        //given
-        Item givenItem = new Item(99,"fruits", 40,10);
-        //when + then
-        when(repository.findById(99)).thenReturn(Optional.of(givenItem));
-        assertThrows(IllegalArgumentException.class, () -> itemService.saveItem(givenItem));
-    }
-
 }

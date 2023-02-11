@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/items")
 public class ItemController {
 
     @Autowired
@@ -20,28 +21,25 @@ public class ItemController {
 
     @GetMapping("/item-from-business-service")
     public Item itemFromBusinessService() {
-
-        Item item = itemService.retrieveHardcodedItem();
-        return item;
+        return itemService.retrieveHardcodedItem();
     }
 
-    @GetMapping("/items/{id}")
+    @GetMapping("/{id}")
     public Item retrieveById(@PathVariable int id) {
         return itemService.retrieveById(id);
     }
 
-    @GetMapping("/all-items")
+    @GetMapping
     public List<Item> retrieveAllItems() {
         return itemService.retrieveAllItems();
     }
 
-    @PostMapping("/items")
+    @PostMapping
     public Item createItem(@RequestBody Item item) {
-        Item createdItem = itemService.saveItem(item);
-        return createdItem;
+        return itemService.saveItem(item);
     }
 
-    @PutMapping("/items")
+    @PutMapping
     public Item updateItem(@RequestBody Item item) {
         return itemService.updateItem(item);
     }
